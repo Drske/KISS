@@ -1,6 +1,6 @@
 import click
 from kiss.utils.configs import CONFIGS, save_configs, get_default_configs
-from kiss.utils.strings import print_key_value
+from kiss.utils.strings import print_key_value, Format
 
 @click.group()
 def cli():
@@ -11,6 +11,17 @@ def cli():
         $ kiss config display
     """
     pass
+
+@cli.command()
+def hello():
+    """
+    Display hello message.
+
+    Example:
+        $ kiss hello
+    """
+    with Format(Format.BOLD, Format.GREEN):
+        print("Everything seems to work fine! MWAH \U0001F618\U0001F609")
 
 @cli.group()
 def config():

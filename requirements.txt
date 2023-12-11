@@ -1,0 +1,7 @@
+tqdm
+click
+dotwiz
+pyYAML
+appdirs
+faiss-cpu
+datasets[vision]

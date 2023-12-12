@@ -32,7 +32,11 @@ def get_configs() -> DotWiz:
     config_dir = os.path.join(appdirs.user_config_dir('kiss'), 'configs')
     yamls = glob(os.path.join(config_dir, '*.yaml'))
 
-    configs = {}
+    configs = {
+        'torch': {
+            'device': 'mps'
+        }
+    }
 
     for file in yamls:
         key = os.path.splitext(os.path.basename(file))[0]

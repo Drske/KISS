@@ -5,3 +5,8 @@ pyYAML
 appdirs
 faiss-cpu
 datasets[vision]
+pillow
+matplotlib
+scikit-learn
+numpy
+pandas

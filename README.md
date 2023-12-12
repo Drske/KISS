@@ -1,7 +1,6 @@
 # KISS
 Klustering Images for Subset Selection. Research on the challenge of selecting a representative training subset for convolutional neural classifiers, employing methods that leverage clustering and difficulty estimation for specialized sample selection. Explore various techniques, experiments, and tools designed to address this problem.
 
-
 ## About
 In this project, our goal is to design and implement efficient methods for selecting a training subset from a larger image dataset. The chosen subsets should be relatively small while maintaining or slightly compromising classification accuracy.
 
@@ -57,6 +56,9 @@ Contains the source code of the `kiss` project.
 
 ### notebooks
 Explore useful notebooks, including examples or prototypes.
+
+### checkpoints
+All pretrained model weights are stored here.
 
 
 ## License

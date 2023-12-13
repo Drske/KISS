@@ -1,3 +1,4 @@
+import time
 from typing import Callable, Any
 
 def TimeIt(func: Callable[..., Any]) -> Callable[..., Any]:

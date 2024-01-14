@@ -3,7 +3,14 @@ import yaml
 import appdirs
 from dotwiz import DotWiz
 from glob import glob
-from typing import Optional
+
+def clear_configs_dir() -> None:
+    config_dir = os.path.join(appdirs.user_config_dir('kiss'), 'configs')
+    
+    for filename in os.listdir(config_dir):
+        if os.path.isfile(os.path.join(config_dir, filename)):
+            os.remove(os.path.join(config_dir, filename))
+
 
 def get_default_configs() -> DotWiz:
     """
@@ -15,7 +22,12 @@ def get_default_configs() -> DotWiz:
     Example:
         default_configs = get_default_configs()
     """
-    configs = {}
+    configs = {
+        'torch': {
+            'device': 'mps'
+        }
+    }
+    
     return DotWiz(configs)
 
 
@@ -53,6 +65,7 @@ def save_configs(configs: DotWiz) -> None:
         save_configs(user_configs)
     """
     config_dir = os.path.join(appdirs.user_config_dir('kiss'), 'configs')
+    
 
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
@@ -75,8 +88,6 @@ def check_configs() -> bool:
     config_dir = os.path.join(appdirs.user_config_dir('kiss'), 'configs')
     return os.path.exists(config_dir)
 
-
-# Loading configurations
 if check_configs():
     CONFIGS: DotWiz = get_configs()
 else:

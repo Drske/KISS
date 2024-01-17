@@ -162,3 +162,7 @@ cython_debug/
 # Datasets
 data/cifar-100*
 data/cifar-10*
+
+# Experiments
+experiments/*
+!experiments/.gitkeep

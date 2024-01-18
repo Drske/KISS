@@ -41,9 +41,9 @@ class Experiment:
             self.rstop = ratio[1]
             self.rnum = ratio[2]
 
-        self.sampler_cls = sampler_cls
+        self.sampler_ : Sampler = sampler_cls(dataset_tr, ratio, **kwargs)
         
-        self.experiment_name = name or f"{self.model.__class__.__name__}!{self.dataset_tr_.__class__.__name__}!{sampler_cls.__name__}"
+        self.experiment_name = name or f"{self.model.__class__.__name__}!{dataset_tr.__class__.__name__}!{self.sampler_.__class__.__name__}"
         
         self.batch_size = kwargs.get("batch_size", 512)
         self.num_workers = kwargs.get("num_workers", 0)
@@ -81,19 +81,18 @@ class Experiment:
                 self._test()
 
     def _train(self, ratio: float):
-        sampler_tr = self.sampler_cls(self.dataset_tr_, ratio)
+        self.sampler_.calculate_indices(ratio)
         
-        num_train = int(0.8 * len(sampler_tr))
-        num_valid = len(sampler_tr) - num_train
+        num_train = int(0.8 * len(self.sampler_))
+        num_valid = len(self.sampler_) - num_train
         
-        train_dataset, valid_dataset = random_split(sampler_tr, [num_train, num_valid])
+        train_dataset, valid_dataset = random_split(self.sampler_, [num_train, num_valid])
         
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
         valid_loader = DataLoader(valid_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
         
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.AdamW(self.model.parameters())
-        # optimizer = optim.AdamW(self.model.parameters(), lr=0.01, weight_decay=0.1)
         best_valid_acc = 0
         
         self.model.train()

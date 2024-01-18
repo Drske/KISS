@@ -8,6 +8,8 @@ datasets[vision]
 pillow
 matplotlib
 scikit-learn
+scikit-image
 numpy
 pandas
 namegenerator
+opencv-python  

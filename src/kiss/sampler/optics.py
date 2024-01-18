@@ -6,8 +6,9 @@ from sklearn.cluster import OPTICS
 from .base import Sampler
 
 class OpticsSampler(Sampler):
-    def __init__(self, dataset, ratio=1.0, **kwargs):
+    def __init__(self, dataset, ratio=1.0, eqsize=True, **kwargs):
         super().__init__(dataset, ratio)
+        self.eqsize = eqsize
                 
         self.class_data_ = self._get_class_data()
         self.cluster_data_ = self._get_cluster_data(self.class_data_)
@@ -44,7 +45,7 @@ class OpticsSampler(Sampler):
                 for idx in indices:
                     self.indices.append(idx)
         
-        if len(self.indices) < num_samples:
+        if len(self.indices) < num_samples and self.eqsize:
             selected = set(self.indices)
             remained = set(range(len(self.dataset_)))
             available = remained - selected
@@ -64,7 +65,7 @@ class OpticsSampler(Sampler):
         cluster_data = defaultdict(list)
         
         for label, indices in class_data.items():
-            print("Predicting first optics")
+            print("Predicting next optics")
             data = [self.dataset_[i][0].numpy().flatten() for i in indices]
             optics = OPTICS(min_samples=3, n_jobs=-1)
             labels = optics.fit_predict(data)

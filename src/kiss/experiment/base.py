@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from torchvision.datasets.vision import VisionDataset
 from torch.utils.data import random_split
 
-from kiss.sampler.base import Sampler
+from kiss.sampler._sampler import Sampler
 from kiss.utils.strings import Format
 from kiss.utils.configs import CONFIGS
 

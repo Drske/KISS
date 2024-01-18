@@ -1,5 +1,6 @@
-from torchvision.datasets.vision import VisionDataset
 from abc import abstractmethod
+from torchvision.datasets.vision import VisionDataset
+
 
 class Sampler:
     indices : list

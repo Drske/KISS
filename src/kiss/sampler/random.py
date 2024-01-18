@@ -1,5 +1,6 @@
-from .base import Sampler
 import random
+
+from ._sampler import Sampler
 
 
 class RandomSampler(Sampler):

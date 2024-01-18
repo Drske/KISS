@@ -160,9 +160,9 @@ cython_debug/
 #.idea/
 
 # Datasets
-data/cifar-100*
-data/cifar-10*
+data/*
 
 # Experiments
 experiments/*
 !experiments/.gitkeep
+

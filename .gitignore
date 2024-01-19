@@ -164,8 +164,12 @@ cython_debug/
 
 # Datasets
 data/*
+!/data/.gitkeep
 
 # Experiments
 experiments/*
 !experiments/.gitkeep
 
+# Checkpoints
+checkpoints/*
+!checkpoints/.gitkeep

@@ -18,7 +18,9 @@ class KMeansNumerousClusters(KMeansSampler):
             
             cluster_sizes = dict(Counter(clusters))
             cluster_sizes = dict(sorted(cluster_sizes.items(), key=lambda item: item[1], reverse=True))
+            print(label, cluster_sizes)
             keep_clusters = list(cluster_sizes.keys())[:int(self.num_clusters_ * self.numerous_ratio_)]
+            print("keep clusters:", keep_clusters)
         
             combined = list(zip(indices, clusters))
             random.shuffle(combined)

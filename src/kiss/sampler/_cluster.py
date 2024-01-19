@@ -49,8 +49,12 @@ class ClusterSampler(Sampler):
             for _, indices in clusters.items():
                 for idx in indices:
                     self.indices.append(idx)
+                    
+                    
+        
         
         num_samples = int(len(self.dataset_) * ratio)
+        print(num_samples, len(self.indices))
         if len(self.indices) < num_samples and self.eqsize:
             selected = set(self.indices)
             remained = set(range(len(self.dataset_)))
@@ -78,7 +82,7 @@ class ClusterSampler(Sampler):
         image = np.round(image * 255).astype(np.uint8)
         
         # Color histogram
-        hist_size = 8
+        hist_size = 4
         b_hist = cv2.calcHist([image], [0], None, [hist_size], (0, 256), accumulate=False)
         g_hist = cv2.calcHist([image], [1], None, [hist_size], (0, 256), accumulate=False)
         r_hist = cv2.calcHist([image], [2], None, [hist_size], (0, 256), accumulate=False)
@@ -100,7 +104,7 @@ class ClusterSampler(Sampler):
         skewness_values = [scipy.stats.skew(hist)]
         kurtosis_values = [scipy.stats.kurtosis(hist)]
         
-        grid_size = 4
+        grid_size = 2
         grid_features = []
         for i in range(grid_size):
             for j in range(grid_size):
@@ -111,7 +115,7 @@ class ClusterSampler(Sampler):
                 grid_features.extend(grid_mean)
                 grid_features.extend(grid_std)
         
-        hog_features = feature.hog(gray_image, orientations=8, pixels_per_cell=(8, 8), cells_per_block=(1, 1))
+        hog_features = feature.hog(gray_image, orientations=3, pixels_per_cell=(8, 8), cells_per_block=(1, 1))
         
         edges = cv2.Canny(gray_image, threshold1=30, threshold2=100)
         edge_density = [np.sum(edges) / (edges.shape[0] * edges.shape[1])]
@@ -121,17 +125,17 @@ class ClusterSampler(Sampler):
         
         # Concatenate all features
         features = np.concatenate([
-            hist / np.sum(hist), 
-            central_moments, 
-            hist_lbp / np.sum(hist_lbp),
-            mean_values, 
-            std_values, 
-            skewness_values, 
-            kurtosis_values,
-            grid_features,
-            hog_features,
-            edge_density,
-            hu_moments.flatten()
+            hist,
+            # central_moments, 
+            # hist_lbp,
+            # mean_values, 
+            # std_values, 
+            # skewness_values, 
+            # kurtosis_values,
+            # grid_features,
+            # hog_features,
+            # edge_density,
+            # hu_moments.flatten()
         ])
         
         return features

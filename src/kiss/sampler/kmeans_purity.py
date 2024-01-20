@@ -48,7 +48,7 @@ class KMeansPuritySampler(PurityClusterSampler):
         data = self.feature_extractor(imgs)
         
         print("Clustering examples...")
-        kmeans = KMeans(n_clusters=self.num_clusters_, n_init=10)
+        kmeans = KMeans(n_clusters=self.num_clusters_, n_init=1)
         clusters = kmeans.fit_predict(data)
         
         for label, indices in tqdm(class_data.items(), desc="Creating cluster data"):

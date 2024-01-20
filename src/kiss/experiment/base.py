@@ -111,6 +111,7 @@ class Experiment:
             f.write(f"{num_valid}")
         
     def __train_epoch(self, train_loader, epoch, criterion, optimizer):
+        self.model.train()
         running_loss = 0.0
 
         with tqdm(total=len(train_loader), desc=f"Epoch {epoch + 1}/{self.epochs}", unit=" batch") as pbar:
@@ -132,6 +133,7 @@ class Experiment:
                 pbar.set_postfix(loss=f"{running_loss / batchno:.4f}")
     
     def __valid_epoch(self, valid_loader, best_valid_acc):
+        self.model.eval()
         correct = 0
         total = 0
 

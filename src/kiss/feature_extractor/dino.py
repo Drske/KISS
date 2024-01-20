@@ -11,7 +11,7 @@ FeatureSize = {
     'dinov2_vitg14': 1536
 }
 
-class FeatureExtractor:
+class DinoFeatureExtractor:
     def __init__(
         self,
         dinov2_name: Dinov2Models = 'dinov2_vits14',

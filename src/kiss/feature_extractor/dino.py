@@ -3,6 +3,8 @@ import numpy as np
 from torchvision import transforms
 from typing import Literal
 
+from kiss.utils.configs import CONFIGS
+
 Dinov2Models = Literal['dinov2_vits14', 'dinov2_vitb14', 'dinov2_vitl14', 'dinov2_vitg14']
 FeatureSize = {
     'dinov2_vits14': 384, 
@@ -15,9 +17,9 @@ class DinoFeatureExtractor:
     def __init__(
         self,
         dinov2_name: Dinov2Models = 'dinov2_vits14',
-        device: torch.device = torch.device('cpu'),
+        device: torch.device = None,
     ):
-        self.device = device
+        self.device = device or torch.device(CONFIGS.torch.device)
         self.model = torch.hub.load('facebookresearch/dinov2', dinov2_name).to(self.device)
         self.patch_size = 14
         self.patch_h = 520 // self.patch_size

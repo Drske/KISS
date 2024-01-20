@@ -167,9 +167,9 @@ data/*
 !/data/.gitkeep
 
 # Experiments
-experiments/*
+# experiments/*
 !experiments/.gitkeep
 
 # Checkpoints
-checkpoints/*
+# checkpoints/*
 !checkpoints/.gitkeep

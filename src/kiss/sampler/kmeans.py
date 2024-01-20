@@ -20,10 +20,6 @@ class KMeansSampler(ClusterSampler):
         num_samples_per_cluster = max(2, int(len(self.dataset_) * self.ratio_ / len(self.class_data_) / self.num_clusters_))
         for (label, indices), (_, clusters) in zip(self.class_data_.items(), self.cluster_data_.items()):
             selected_indices[label] = {}
-            
-            cluster_sizes = dict(Counter(clusters))
-            cluster_sizes = dict(sorted(cluster_sizes.items(), key=lambda item: item[1], reverse=True))
-            print(label, cluster_sizes)
         
             combined = list(zip(indices, clusters))
             random.shuffle(combined)

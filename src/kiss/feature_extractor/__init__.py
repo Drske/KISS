@@ -1,2 +1,2 @@
-from .dino import DinoFeatureExtractor
+from .dino import DinoFeatureExtractor, Dinov2Models
 from .classic import ClassicFeatureExtractor

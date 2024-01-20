@@ -3,16 +3,18 @@ import numpy as np
 
 from tqdm import tqdm
 from collections import defaultdict, Counter
-from sklearn.cluster import OPTICS, SpectralClustering, Birch
+from sklearn.cluster import OPTICS, SpectralClustering, Birch, MeanShift
 from sklearn.preprocessing import MinMaxScaler
 
 
 from ._cluster import ClusterSampler
+from ..feature_extractor import ClassicFeatureExtractor
 
 
 class OpticsSampler(ClusterSampler):
     def __init__(self, dataset, ratio=1.0, eqsize=True, numerous_ratio = 0.5, **kwargs):
         self.numerous_ratio_ = numerous_ratio
+        self.feature_extractor = ClassicFeatureExtractor()
         super().__init__(dataset, ratio, eqsize, **kwargs)
             
     def _select_indices(self):        
@@ -53,11 +55,9 @@ class OpticsSampler(ClusterSampler):
         cluster_data = defaultdict(list)
         
         for label, indices in tqdm(class_data.items(), desc="Clustering"):
-            data = [self._extract_features(self.dataset_[i][0]) for i in indices]
-            # data = [self.dataset_[i][0].numpy().flatten() for i in indices]
-            scaler = MinMaxScaler()
-            data = scaler.fit_transform(data)
-            optics = OPTICS(n_jobs=-1)
+            imgs = [self.dataset_[i][0] for i in indices]
+            data = self.feature_extractor(imgs)
+            optics = OPTICS()
             labels = optics.fit_predict(data)
             cluster_data[label] = labels
             

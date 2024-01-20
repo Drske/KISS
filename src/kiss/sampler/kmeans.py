@@ -6,11 +6,13 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler
 
 from ._cluster import ClusterSampler
+from ..feature_extractor import ClassicFeatureExtractor
 
 
 class KMeansSampler(ClusterSampler):
     def __init__(self, dataset, ratio=1.0, num_clusters: int = 10, eqsize=True, **kwargs):
         self.num_clusters_ = num_clusters
+        self.feature_extractor = ClassicFeatureExtractor()
         super().__init__(dataset, ratio, eqsize, **kwargs)
 
     def _select_indices(self):
@@ -42,10 +44,8 @@ class KMeansSampler(ClusterSampler):
         cluster_data = defaultdict(list)
         
         for label, indices in tqdm(class_data.items(), desc="Clustering"):
-            # data = [self._extract_features(self.dataset_[i][0]) for i in indices]
-            data = [self.dataset_[i][0].numpy().flatten() for i in indices]
-            scaler = MinMaxScaler()
-            data = scaler.fit_transform(data)
+            imgs = [self.dataset_[i][0] for i in indices]
+            data = self.feature_extractor(imgs)
             kmeans = KMeans(n_clusters=self.num_clusters_, n_init=10)
             labels = kmeans.fit_predict(data)
             cluster_data[label] = labels

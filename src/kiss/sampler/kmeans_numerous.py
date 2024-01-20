@@ -5,7 +5,7 @@ from collections import Counter
 from .kmeans import KMeansSampler
 
 
-class KMeansNumerousClusters(KMeansSampler):
+class KMeansNumerousSampler(KMeansSampler):
     def __init__(self, dataset, ratio=1.0, num_clusters: int = 10, eqsize=True, numerous_ratio = 0.5, **kwargs):
         self.numerous_ratio_ = numerous_ratio
         super().__init__(dataset, ratio, num_clusters, eqsize, **kwargs)

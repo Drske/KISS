@@ -1,3 +1,6 @@
+# MacOS
+*.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -161,8 +164,12 @@ cython_debug/
 
 # Datasets
 data/*
+!/data/.gitkeep
 
 # Experiments
 experiments/*
 !experiments/.gitkeep
 
+# Checkpoints
+checkpoints/*
+!checkpoints/.gitkeep

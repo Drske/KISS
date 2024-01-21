@@ -1,1 +1,2 @@
-from .feature_extractor import FeatureExtractor, Dinov2Models
+from .dino import DinoFeatureExtractor, Dinov2Models
+from .classic import ClassicFeatureExtractor

@@ -93,13 +93,15 @@ class Experiment:
         
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.AdamW(self.model.parameters())
-        best_valid_acc = 0
+        
+        best_valid_loss = np.inf
+        best_valid_acc = 0.0
         
         self.model.train()
         
         for epoch in range(self.epochs):            
             self.__train_epoch(train_loader, epoch, criterion, optimizer)
-            best_valid_acc = self.__valid_epoch(valid_loader, best_valid_acc)
+            best_valid_loss, best_valid_acc = self.__valid_epoch(valid_loader, criterion, best_valid_loss, best_valid_acc)
             
         with open(os.path.join(self.run_savepath_, 'ratio.txt'), 'w+') as f:
             f.write(f"{ratio:.2f}")
@@ -132,31 +134,45 @@ class Experiment:
                 pbar.update(1)
                 pbar.set_postfix(loss=f"{running_loss / batchno:.4f}")
     
-    def __valid_epoch(self, valid_loader, best_valid_acc):
+    def __valid_epoch(self, valid_loader, criterion, best_valid_loss, best_valid_acc):
         self.model.eval()
+        
         correct = 0
         total = 0
+        running_loss = 0.0
 
         with torch.no_grad():
             with tqdm(total=len(valid_loader), desc="Validating", unit=" batch") as pbar:
-                for inputs, labels in valid_loader:
+                for batchno, (inputs, labels) in enumerate(valid_loader, start=1):
                     inputs, labels = inputs.to(self.device), labels.to(self.device)
+                    
                     outputs = self.model(inputs)
+                    loss = criterion(outputs, labels)
+                    
                     _, predicted = torch.max(outputs, 1)
                     total += labels.size(0)
                     correct += (predicted == labels).sum().item()
                     
+                    running_loss += loss.item()
                     pbar.update(1)
+                    pbar.set_postfix(loss=f"{running_loss / batchno:.4f}")
                 
         accuracy = correct / total
+        valid_loss = running_loss / len(valid_loader)
         
+        if valid_loss < best_valid_loss:
+            with Format(Format.BOLD, Format.CYAN):
+                print(f"Best valid loss improved. Current accuracy is {accuracy * 100:.2f}%. Saving checkpoint...")
+            best_valid_loss = valid_loss
+            torch.save(self.model.state_dict(), f"{self.run_savepath_}/model.pth")
+            
         if accuracy > best_valid_acc:
             with Format(Format.BOLD, Format.CYAN):
-                print(f"Best valid accuracy improved from {best_valid_acc * 100:.2f}% to {accuracy * 100:.2f}%. Saving checkpoint...")
+                print(f"Best valid accuracy improved. Current accuracy is {accuracy * 100:.2f}%. Saving checkpoint...")
             best_valid_acc = accuracy
             torch.save(self.model.state_dict(), f"{self.run_savepath_}/model.pth")
             
-        return best_valid_acc
+        return best_valid_loss, best_valid_acc
 
     def _test(self):
         test_loader = DataLoader(self.dataset_te_, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
@@ -164,7 +180,9 @@ class Experiment:
         self.model.load_state_dict(torch.load(f"{self.run_savepath_}/model.pth"))
 
         self.model.eval()
-        correct = 0
+        top1 = 0
+        top3 = 0
+        top5 = 0
         total = 0
 
         with torch.no_grad():
@@ -172,18 +190,33 @@ class Experiment:
                 for inputs, labels in test_loader:
                     inputs, labels = inputs.to(self.device), labels.to(self.device)
                     outputs = self.model(inputs)
-                    _, predicted = torch.max(outputs, 1)
+                    _, predicted_top1 = torch.max(outputs, 1)
+                    _, predicted_top3 = torch.topk(outputs, 3)
+                    _, predicted_top5 = torch.topk(outputs, 5)
+                    
+                    
+                    top1 += (predicted_top1 == labels).sum().item()
+                    top3 += torch.sum(torch.any(predicted_top3 == labels.view(-1, 1), dim=1)).item()
+                    top5 += torch.sum(torch.any(predicted_top5 == labels.view(-1, 1), dim=1)).item()
                     total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
 
                     pbar.update(1)
 
-        accuracy = correct / total
+        acc_top1 = top1 / total
+        acc_top3 = top3 / total
+        acc_top5 = top5 / total
         
         with open(os.path.join(self.run_savepath_, 'acc.txt'), 'w+') as f:
-            f.write(f"{100 * accuracy:.2f}%")
+                f.write(f"{100 * acc_top1:.2f}%")
+                
+        with open(os.path.join(self.run_savepath_, 'top3.txt'), 'w+') as f:
+                f.write(f"{100 * acc_top3:.2f}%")
+                
+        with open(os.path.join(self.run_savepath_, 'top5.txt'), 'w+') as f:
+                f.write(f"{100 * acc_top5:.2f}%")
             
         with open(os.path.join(self.run_savepath_, 'test_size.txt'), 'w+') as f:
             f.write(f"{len(self.dataset_te_)}")
+
 
 

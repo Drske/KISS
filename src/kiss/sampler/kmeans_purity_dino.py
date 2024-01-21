@@ -15,8 +15,8 @@ class KMeansPurityDinoSampler(KMeansPuritySampler):
         self.num_clusters_ = num_clusters
         self.dinov2_name = dinov2_name
         self.device = device or torch.device(CONFIGS.torch.device)
-        super().__init__(dataset, ratio, num_clusters, eqsize, min_purity, **kwargs)
         self.feature_extractor = DinoFeatureExtractor(self.dinov2_name, self.device)
+        super().__init__(dataset, ratio, num_clusters, eqsize, min_purity, **kwargs)
 
     def _get_cluster_data(self, class_data):
         cluster_data = defaultdict(list)

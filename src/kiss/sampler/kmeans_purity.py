@@ -12,7 +12,8 @@ from ..feature_extractor import ClassicFeatureExtractor
 class KMeansPuritySampler(PurityClusterSampler):
     def __init__(self, dataset, ratio=1.0, num_clusters: int = 10, eqsize=True, min_purity=0.5, **kwargs):
         self.num_clusters_ = num_clusters
-        self.feature_extractor = ClassicFeatureExtractor()
+        if not hasattr(self, "feature_extractor"):
+            self.feature_extractor = ClassicFeatureExtractor()
         super().__init__(dataset, ratio, eqsize, min_purity, **kwargs)
 
     def _select_indices(self):

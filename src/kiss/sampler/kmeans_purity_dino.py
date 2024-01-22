@@ -20,10 +20,10 @@ class KMeansPurityDinoSampler(KMeansPuritySampler):
 
     def _get_cluster_data(self, class_data):
         cluster_data = defaultdict(list)
-        
+
         print("Extracting features...")
         data = np.vstack([self._extract_features(img) for img, _ in self.dataset_]) 
-        
+
         print("Clustering examples...")
         kmeans = faiss.Kmeans(d=self.feature_extractor.feature_size, k=self.num_clusters_, niter=20)
         kmeans.train(data)

@@ -12,6 +12,7 @@ from torch.nn import Module
 from torch.utils.data import DataLoader
 from torchvision.datasets.vision import VisionDataset
 from torch.utils.data import random_split
+from sklearn.model_selection import StratifiedShuffleSplit
 
 from kiss.sampler._sampler import Sampler
 from kiss.sampler import RandomSampler
@@ -37,7 +38,8 @@ class Experiment:
         # NEW
         num_train = int(0.8 * len(self.dataset_tr_))
         num_valid = len(self.dataset_tr_) - num_train
-        self.dataset_tr_, self.dataset_val_ = random_split(self.dataset_tr_, [num_train, num_valid])
+        # self.dataset_tr_, self.dataset_val_ = random_split(self.dataset_tr_, [num_train, num_valid])
+        self.dataset_tr_, self.dataset_val_ = self.__stratified_train_val_split(self.dataset_tr_)
         # NEW
 
         if isinstance(ratio, (float, int)):
@@ -226,6 +228,19 @@ class Experiment:
             
         with open(os.path.join(self.run_savepath_, 'test_size.txt'), 'w+') as f:
             f.write(f"{len(self.dataset_te_)}")
+            
+    import torch
 
 
+    def __stratified_train_val_split(self, dataset, val_size=0.2, random_seed=None):
+        labels = [label for _, label in dataset]
+        labels_array = torch.tensor(labels).numpy()
 
+        stratified_splitter = StratifiedShuffleSplit(n_splits=1, test_size=val_size, random_state=random_seed)
+
+        train_index, test_index = next(stratified_splitter.split(labels_array, labels_array))
+
+        train_dataset = torch.utils.data.Subset(dataset, train_index)
+        test_dataset = torch.utils.data.Subset(dataset, test_index)
+
+        return train_dataset, test_dataset

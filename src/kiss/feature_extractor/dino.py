@@ -38,11 +38,13 @@ class DinoFeatureExtractor:
         if mean:
             features = features.mean(axis=1)
 
+        features.detach().cpu().numpy()
+        
         return features.detach().cpu().numpy()
 
     def _preprocess(self, imgs: torch.Tensor) -> torch.Tensor:
         transform = transforms.Compose([
-            transforms.Resize(520),
+            transforms.Resize(520, antialias=True),
             transforms.CenterCrop(518),                         
             transforms.Normalize(mean=0.5, std=0.2)
         ])

@@ -97,5 +97,4 @@ class PurityClusterSampler(Sampler):
             for cluster in clusters:
                 purity_data[label][cluster] /= cluster_sizes[cluster]
                         
-        from pprint import pprint
         return purity_data

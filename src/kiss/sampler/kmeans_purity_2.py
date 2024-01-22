@@ -9,7 +9,7 @@ from ._purity_cluster import PurityClusterSampler
 from ..feature_extractor import ClassicFeatureExtractor
 
 
-class KMeansPuritySampler(PurityClusterSampler):
+class KMeansPurity2Sampler(PurityClusterSampler):
     def __init__(self, dataset, ratio=1.0, num_clusters: int = 10, eqsize=True, min_purity=0.5, **kwargs):
         self.num_clusters_ = num_clusters
         if not hasattr(self, "feature_extractor"):
@@ -19,21 +19,33 @@ class KMeansPuritySampler(PurityClusterSampler):
     def _select_indices(self):
         selected_indices = {}
         
-        for (label, indices), (_, clusters) in zip(self.class_data_.items(), self.cluster_data_.items()):
-            num_samples_per_label = max(2, int(len(indices) * self.ratio_))
-            selected_indices[label] = []
         
+        
+        for (label, indices), (_, clusters) in zip(self.class_data_.items(), self.cluster_data_.items()):
+            selected_indices[label] = []
+            num_samples_per_label = max(2, int(len(indices) * self.ratio_ ))
+                    
             combined = list(zip(indices, clusters))
             random.shuffle(combined)
             indices, clusters = zip(*combined)
-
-            for indice, cluster in zip(indices, clusters):
-                if self.purity_data_[label][cluster] < self.min_purity_: continue
+            
+            purities = dict(Counter(self.purity_data_[label]))
+            purities = sorted(purities.items(), key=lambda item: item[1], reverse=True)
+            
+            print(label, purities)
+            
+            for select_from_cluster, _ in purities:
+                for indice, cluster in zip(indices, clusters):
+                    if cluster != select_from_cluster: continue
+                    
+                    selected_indices[label].append(indice)
                 
-                selected_indices[label].append(indice)
-                
+                    if len(selected_indices[label]) == num_samples_per_label: break
+                    if len(selected_indices[label]) == len(indices): break
+                    
                 if len(selected_indices[label]) == num_samples_per_label: break
-        
+                if len(selected_indices[label]) == len(indices): break
+                
         return selected_indices
             
     def _get_cluster_data(self, class_data):

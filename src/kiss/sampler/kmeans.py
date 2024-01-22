@@ -18,8 +18,9 @@ class KMeansSampler(ClusterSampler):
 
     def _select_indices(self):
         selected_indices = {}
-        num_samples_per_cluster = max(2, int(len(self.dataset_) * self.ratio_ / len(self.class_data_) / self.num_clusters_))
+        
         for (label, indices), (_, clusters) in zip(self.class_data_.items(), self.cluster_data_.items()):
+            num_samples_per_cluster = max(2, int(len(indices) * self.ratio_  / self.num_clusters_))
             selected_indices[label] = {}
         
             combined = list(zip(indices, clusters))

@@ -12,8 +12,10 @@ from torch.nn import Module
 from torch.utils.data import DataLoader
 from torchvision.datasets.vision import VisionDataset
 from torch.utils.data import random_split
+from sklearn.model_selection import StratifiedShuffleSplit
 
 from kiss.sampler._sampler import Sampler
+from kiss.sampler import RandomSampler
 from kiss.utils.strings import Format
 from kiss.utils.configs import CONFIGS
 
@@ -32,6 +34,13 @@ class Experiment:
         self.model_ = deepcopy(model)
         self.dataset_tr_ = dataset_tr
         self.dataset_te_ = dataset_te
+        
+        # NEW
+        num_train = int(0.8 * len(self.dataset_tr_))
+        num_valid = len(self.dataset_tr_) - num_train
+        # self.dataset_tr_, self.dataset_val_ = random_split(self.dataset_tr_, [num_train, num_valid])
+        self.dataset_tr_, self.dataset_val_ = self.__stratified_train_val_split(self.dataset_tr_)
+        # NEW
 
         if isinstance(ratio, (float, int)):
             self.ratio = ratio
@@ -41,7 +50,7 @@ class Experiment:
             self.rstop = ratio[1]
             self.rnum = ratio[2]
 
-        self.sampler_ : Sampler = sampler_cls(dataset_tr, ratio, **kwargs)
+        self.sampler_ : Sampler = sampler_cls(self.dataset_tr_, ratio, **kwargs)
         
         self.experiment_name = name or f"{self.model.__class__.__name__}!{dataset_tr.__class__.__name__}!{self.sampler_.__class__.__name__}"
         
@@ -83,10 +92,12 @@ class Experiment:
     def _train(self, ratio: float):
         self.sampler_.calculate_indices(ratio)
         
-        num_train = int(0.8 * len(self.sampler_))
-        num_valid = len(self.sampler_) - num_train
+        # num_train = int(0.8 * len(self.sampler_))
+        # num_valid = len(self.sampler_) - num_train
         
-        train_dataset, valid_dataset = random_split(self.sampler_, [num_train, num_valid])
+        # train_dataset, valid_dataset = random_split(self.sampler_, [num_train, num_valid])
+        train_dataset = self.sampler_
+        valid_dataset = self.dataset_val_
         
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
         valid_loader = DataLoader(valid_dataset, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
@@ -107,10 +118,10 @@ class Experiment:
             f.write(f"{ratio:.2f}")
             
         with open(os.path.join(self.run_savepath_, 'train_size.txt'), 'w+') as f:
-            f.write(f"{num_train}")
+            f.write(f"{len(train_dataset)}")
             
         with open(os.path.join(self.run_savepath_, 'valid_size.txt'), 'w+') as f:
-            f.write(f"{num_valid}")
+            f.write(f"{len(valid_dataset)}")
         
     def __train_epoch(self, train_loader, epoch, criterion, optimizer):
         self.model.train()
@@ -217,6 +228,19 @@ class Experiment:
             
         with open(os.path.join(self.run_savepath_, 'test_size.txt'), 'w+') as f:
             f.write(f"{len(self.dataset_te_)}")
+            
+    import torch
 
 
+    def __stratified_train_val_split(self, dataset, val_size=0.2, random_seed=None):
+        labels = [label for _, label in dataset]
+        labels_array = torch.tensor(labels).numpy()
 
+        stratified_splitter = StratifiedShuffleSplit(n_splits=1, test_size=val_size, random_state=random_seed)
+
+        train_index, test_index = next(stratified_splitter.split(labels_array, labels_array))
+
+        train_dataset = torch.utils.data.Subset(dataset, train_index)
+        test_dataset = torch.utils.data.Subset(dataset, test_index)
+
+        return train_dataset, test_dataset

@@ -24,8 +24,11 @@ class KMeansDinoSampler(KMeansSampler):
         
         for label, indices in tqdm(class_data.items(), desc="Clustering"):
             data = np.vstack([self._extract_features(self.dataset_[i][0]) for i in indices])
+            print("Preparing faiss")
             kmeans = faiss.Kmeans(d=self.feature_extractor.feature_size, k=self.num_clusters_, niter=20)
+            print("Faiss prepared")
             kmeans.train(data)
+            print("Faiss trained")
             _, labels = kmeans.index.search(data, 1)
             labels = labels.flatten()
             cluster_data[label] = labels

@@ -3,7 +3,7 @@ click
 dotwiz
 pyYAML
 appdirs
-faiss-cpu
+faiss=1.7.3
 datasets[vision]
 pillow
 matplotlib

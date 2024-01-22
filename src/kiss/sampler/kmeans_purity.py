@@ -19,9 +19,8 @@ class KMeansPuritySampler(PurityClusterSampler):
     def _select_indices(self):
         selected_indices = {}
         
-        num_samples_per_label = max(2, int(len(self.dataset_) * self.ratio_ / len(self.class_data_)))
-        
         for (label, indices), (_, clusters) in zip(self.class_data_.items(), self.cluster_data_.items()):
+            num_samples_per_label = max(2, int(len(indices) * self.ratio_))
             selected_indices[label] = []
         
             combined = list(zip(indices, clusters))
@@ -45,7 +44,7 @@ class KMeansPuritySampler(PurityClusterSampler):
         data = self.feature_extractor(imgs)
         
         print("Clustering examples...")
-        kmeans = KMeans(n_clusters=self.num_clusters_, n_init=1)
+        kmeans = KMeans(n_clusters=self.num_clusters_, n_init=10)
         clusters = kmeans.fit_predict(data)
         
         for label, indices in tqdm(class_data.items(), desc="Creating cluster data"):

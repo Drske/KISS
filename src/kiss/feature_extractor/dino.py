@@ -27,16 +27,22 @@ class DinoFeatureExtractor:
         self.feature_size = FeatureSize[dinov2_name]
 
     def __call__(self, imgs: torch.Tensor, mean=True) -> np.ndarray:
+        print("Dino feature call", self.device)
         preprocessed_imgs = self._preprocess(imgs)
+        print("Preprocessed", self.device)
 
         with torch.no_grad():
             features_dict = self.model.forward_features(preprocessed_imgs.to(self.device))
             features = features_dict['x_norm_patchtokens']
+            
+        print("Features forwarded", self.device)
 
         features.reshape(imgs.shape[0], self.patch_h * self.patch_w, self.feature_size)        
 
         if mean:
             features = features.mean(axis=1)
+            
+        print("Returing detached features")
 
         return features.detach().cpu().numpy()
 

@@ -20,7 +20,7 @@ class KMeansPuritySampler(PurityClusterSampler):
         selected_indices = {}
         
         for (label, indices), (_, clusters) in zip(self.class_data_.items(), self.cluster_data_.items()):
-            num_samples_per_label = max(2, int(len(indices) * self.ratio_))
+            num_samples_per_label = max(1, int(len(indices) * self.ratio_))
             selected_indices[label] = []
         
             combined = list(zip(indices, clusters))
@@ -33,7 +33,7 @@ class KMeansPuritySampler(PurityClusterSampler):
                 selected_indices[label].append(indice)
                 
                 if len(selected_indices[label]) == num_samples_per_label: break
-        
+                
         return selected_indices
             
     def _get_cluster_data(self, class_data):

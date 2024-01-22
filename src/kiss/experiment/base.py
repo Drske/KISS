@@ -11,7 +11,6 @@ from copy import deepcopy
 from torch.nn import Module
 from torch.utils.data import DataLoader
 from torchvision.datasets.vision import VisionDataset
-from torch.utils.data import random_split
 from sklearn.model_selection import StratifiedShuffleSplit
 
 from kiss.sampler._sampler import Sampler
@@ -229,8 +228,6 @@ class Experiment:
         with open(os.path.join(self.run_savepath_, 'test_size.txt'), 'w+') as f:
             f.write(f"{len(self.dataset_te_)}")
             
-    import torch
-
 
     def __stratified_train_val_split(self, dataset, val_size=0.2, random_seed=None):
         labels = [label for _, label in dataset]

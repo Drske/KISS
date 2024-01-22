@@ -20,9 +20,10 @@ class KMeansSampler(ClusterSampler):
         selected_indices = {}
         
         for (label, indices), (_, clusters) in zip(self.class_data_.items(), self.cluster_data_.items()):
-            num_samples_per_cluster = max(2, int(len(indices) * self.ratio_  / self.num_clusters_))
             selected_indices[label] = {}
-        
+            num_samples_per_cluster = dict(Counter(clusters))
+            num_samples_per_cluster = {cluster: max(1, int(size * self.ratio_)) for cluster, size in num_samples_per_cluster.items()}
+            
             combined = list(zip(indices, clusters))
             random.shuffle(combined)
             indices, clusters = zip(*combined)
@@ -31,7 +32,7 @@ class KMeansSampler(ClusterSampler):
                 if cluster not in selected_indices[label]:
                     selected_indices[label][cluster] = []
                     
-                if len(selected_indices[label][cluster]) == num_samples_per_cluster:
+                if len(selected_indices[label][cluster]) == num_samples_per_cluster[cluster]:
                     continue
                 
                 selected_indices[label][cluster].append(indice)

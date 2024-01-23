@@ -34,12 +34,7 @@ class Experiment:
         self.dataset_tr_ = dataset_tr
         self.dataset_te_ = dataset_te
         
-        # NEW
-        num_train = int(0.8 * len(self.dataset_tr_))
-        num_valid = len(self.dataset_tr_) - num_train
-        # self.dataset_tr_, self.dataset_val_ = random_split(self.dataset_tr_, [num_train, num_valid])
         self.dataset_tr_, self.dataset_val_ = self.__stratified_train_val_split(self.dataset_tr_)
-        # NEW
 
         if isinstance(ratio, (float, int)):
             self.ratio = ratio
@@ -91,10 +86,6 @@ class Experiment:
     def _train(self, ratio: float):
         self.sampler_.calculate_indices(ratio)
         
-        # num_train = int(0.8 * len(self.sampler_))
-        # num_valid = len(self.sampler_) - num_train
-        
-        # train_dataset, valid_dataset = random_split(self.sampler_, [num_train, num_valid])
         train_dataset = self.sampler_
         valid_dataset = self.dataset_val_
         

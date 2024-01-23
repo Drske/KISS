@@ -45,10 +45,14 @@ class ClusterSampler(Sampler):
                         
         self.indices = []
         
-        for _, clusters in selected_indices.items():
-            for _, indices in clusters.items():
-                for idx in indices:
-                    self.indices.append(idx)
+        # for _, clusters in selected_indices.items():
+        #     for _, indices in clusters.items():
+        #         for idx in indices:
+        #             self.indices.append(idx)
+        
+        for _, indices in selected_indices.items():
+            for idx in indices:
+                self.indices.append(idx)
                     
         num_samples = int(len(self.dataset_) * ratio)
         print(num_samples, len(self.indices))

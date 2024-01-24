@@ -169,7 +169,7 @@ data/*
 !data/svhn/.gitkeep
 
 # Experiments
-experiments/*
+experiments/**/*.pth
 !experiments/.gitkeep
 
 # Checkpoints

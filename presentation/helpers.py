@@ -140,5 +140,5 @@ def draw_experiment(experiments_dir: str = "../experiments", experiment_name : s
     plt.tight_layout()
     
     if savefig is not None:
-        plt.savefig(savefig)
+        plt.savefig(savefig, dpi=300)
     plt.show()
